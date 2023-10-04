@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_hospital_root"
+              name="Doctor and Patient"
+              web_icon ="doctor_pat,static/description/icon.png"
+              sequence="0"/>
+
+    <menuitem id="menu_patient_master"
+              name="Patient Details"
+              parent="menu_hospital_root"
+              sequence="0"/>
+
+    <menuitem id="menu_department_master"
+              name="Patient Details"
+              parent="menu_hospital_root"
+              sequence="0"/>
+
+    <menuitem id="menu_appointment_master"
+              name="Patient Details"
+              parent="menu_hospital_root"
+              sequence="0"/>
+
+</odoo>

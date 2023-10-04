@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_confirm_appointments" model="ir.actions.server">
+        <field name="name">Confirm Appointment</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hospital_appointment"/>
+        <field name="binding_model_id" ref="model_hospital_appointment"/>
+        <field name="state">code</field>
+        <field name="code">records.action_confirm()</field>
+    </record>
+
+    <record id="view_appointment_tree" model="ir.ui.view">
+        <field name="name">hospital.appointment.tree</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <tree multi_edit="1">
+                <header>
+                    <button name="action_done" string="Mark As Done" class="btn-primary"
+                            type="object"/>
+                </header>
+                <field name="doctor_id"/>
+                <field name="patient_id"/>
+                <field name="appointment_date_time"/>
+                <field name="stage" optional="show"/>
+                <field name="treatment_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_appointment_form" model="ir.ui.view">
+        <field name="name">hospital.appointment.form</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="In Progress" class="btn-primary"
+                            confirm="Are you sure that you need to confirm ?"
+                            type="object" attrs="{'invisible': [('stage', '!=', 'draft')]}"/>
+                    <button name="action_done" string="Mark As Done" class="btn-primary"
+                            type="object" attrs="{'invisible':[('stage', '!=' , 'in_progress'),('stage', '!=', 'draft')]}"/>
+                    <button name="action_draft" string="Set To Draft" class="btn-primary"
+                            type="object" attrs="{'invisible': [('stage', '!=', 'in-progress'),('stage', '!=', 'done')]}"/>
+                    <button name="action_cancel" string="Cancel"
+                            confirm="Are you sure that you need to cancel ?"
+                            type="object" attrs="{'invisible': [('stage', '=', 'cancel')]}"/>
+                    <button name="action_url" string="Open URL" class="btn-primary"
+                            type="object" attrs="{'invisible': [('stage', '!=', 'draft'),('stage', '!=', 'in-progress'),('stage', '!=', 'done'),('stage', '!=', 'cancel')]}"/>
+                    <field name="stage" widget="statusbar" statusbar_visible="draft,done,confirm"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="patient_id"/>
+                            <field name="code"/>
+                            <field name="treatment_id"/>
+                        </group>
+                        <group>
+                            <field name="doctor_id" widget="many2many_tags"/>
+                            <field name="appointment_date_time"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_appointment_search" model="ir.ui.view">
+        <field name="name">hospital.appointment.search</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Patients">
+                <field name="doctor_id"/>
+                <field name="patient_id"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('stage', '=', 'draft')]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Patient" name="patient_id" context="{'group_by':'patient_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_appointment" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.appointment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_draft': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first appointment !
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_appointment_root"
+              name="Appointments"
+              parent="menu_hospital_root"
+              sequence="20"/>
+
+    <menuitem id="menu_appointment"
+              name="Details of Appointments"
+              parent="menu_appointment_root"
+              action="action_hospital_appointment"
+              sequence="10"/>
+
+    <menuitem id="menu_create_appointment"
+              name="Create Appointment"
+              parent="menu_appointment_root"
+              action="action_create_appointment"
+              sequence="20"/>
+
+    <menuitem id="menu_search_appointment"
+              name="Search Appointment"
+              parent="menu_appointment_root"
+              action="action_search_appointment"
+              sequence="30"/>
+
+</odoo>

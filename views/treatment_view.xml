@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_treatment_tree" model="ir.ui.view">
+        <field name="name">hospital.treatment.tree</field>
+        <field name="model">hospital.treatment</field>
+        <field name="arch" type="xml">
+            <tree multi_edit="1">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_treatment_form" model="ir.ui.view">
+        <field name="name">hospital.treatment.form</field>
+        <field name="model">hospital.treatment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_treatment_search" model="ir.ui.view">
+        <field name="name">hospital.treatment.search</field>
+        <field name="model">hospital.treatment</field>
+        <field name="arch" type="xml">
+            <search string="Treatments">
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_doctor_treatment" model="ir.actions.act_window">
+        <field name="name">Treatments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.treatment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_draft': 1}</field>
+    </record>
+
+
+    <menuitem id="menu_treatment_root"
+              name="Treatment"
+              parent="menu_hospital_root"
+              sequence="10"/>
+
+
+    <menuitem id="menu_treatment"
+              name="Details of Treatments"
+              action="action_doctor_treatment"
+              parent="menu_treatment_root"
+              sequence="10"
+              />
+
+</odoo>
