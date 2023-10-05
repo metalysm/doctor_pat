@@ -10,6 +10,7 @@
                         <field name="code"/>
                         <field name="patient_id" required="1"/>
                         <field name="doctor_id" widget="many2many_tags"/>
+                        <field name="appointment_date_time"/>
                     </group>
                     <footer>
                         <button name="action_create_appointment" type="object" string="Create" class="btn-primary"/>
