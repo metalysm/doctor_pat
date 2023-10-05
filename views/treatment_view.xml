@@ -7,6 +7,8 @@
         <field name="arch" type="xml">
             <tree multi_edit="1">
                 <field name="name"/>
+                <field name="appointment_id"/>
+                <field name="is_done"/>
             </tree>
         </field>
     </record>
@@ -19,6 +21,8 @@
                 <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="appointment_id"/>
+                            <field name="is_done"/>
                         </group>
                 </sheet>
             </form>
@@ -31,6 +35,8 @@
         <field name="arch" type="xml">
             <search string="Treatments">
                 <field name="name"/>
+                <field name="appointment_id"/>
+                <field name="is_done"/>
             </search>
         </field>
     </record>

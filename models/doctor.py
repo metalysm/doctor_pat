@@ -18,6 +18,7 @@ class Doctor(models.Model):
     start_time = fields.Float(string='Start Time', widget="float_time")
     end_time = fields.Float(string='End Time', widget="float_time")
     image = fields.Binary(string="Patient Image")
+    active = fields.Boolean(string="Active", default=True)
 
     # @api.onchange('department_id')
     # def _onchange_department(self):

@@ -7,7 +7,7 @@ class HospitalPatient(models.Model):
     _description = "Patient"
     _rec_name = "full_name"
 
-    patient_id = fields.Integer(string='Patient Id', readonly=True, store=True, default=lambda self: self.env['ir.sequence'].next_by_code('hospital.patient') or _('New'))
+    patient_id = fields.Char(string='Patient Id', readonly=True, store=True, default=lambda self: self.env['ir.sequence'].next_by_code('hospital.patient') or _('New'))
     first_name = fields.Char(string=' First Name')
     last_name = fields.Char(string=' Last Name')
     full_name = fields.Char(string=' Full Name', store=True, compute='_compute_full_name')

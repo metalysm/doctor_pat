@@ -9,14 +9,19 @@ class HospitalAppointment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Hospital Appointment"
     #_order = "doctor_id,stage"
+    #_rec_name = "full_name"
 
     appointment_date_time = fields.Datetime(string="Appointment Date & Time")
     code = fields.Char(string="Code", required=True, index=True)
+    #read_only = fields.Char('Field Label', readonly=True)
     doctor_id = fields.Many2many(comodel_name='hospital.doctor', string="Doctor", required=True)
     patient_id = fields.Many2one(comodel_name='hospital.patient', string="Patient", required=True)
     stage = fields.Selection([('draft', 'Draft'), ('in-progress', 'In Progress'), ('done', 'Done'),
                               ('cancel', 'Cancel')], default='draft', string="Stage")
     treatment_id = fields.One2many('hospital.treatment', 'appointment_id', string='Treatments')
+    prescription = fields.Text(string="Prescription")
+    prescription_line_ids = fields.One2many('appointment.prescription.lines', 'appointment_id',
+                                            string="Prescription Lines")
 
     _sql_constraints = [
         ('unique_code', 'unique(code)', 'Code must be unique.'),
@@ -50,11 +55,12 @@ class HospitalAppointment(models.Model):
             raise ValidationError(_("You Cannot Delete %s as it is in Done State" % self.code))
         return super(HospitalAppointment, self).unlink()
 
+
     def action_url(self):
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
-            'url': 'https://apps.odoo.com/apps/modules/14.0/%s/' % self.prescription,
+            'url': 'https://apps.odoo.com/apps/modules/15.0/%s/' % self.prescription,
         }
 
 #
