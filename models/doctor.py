@@ -1,5 +1,5 @@
 from odoo import api, fields, models
-from odoo import exceptions
+from odoo.exceptions import ValidationError
 
 
 class Doctor(models.Model):
@@ -10,13 +10,13 @@ class Doctor(models.Model):
     first_name = fields.Char(string=' First Name')
     last_name = fields.Char(string=' Last Name')
     full_name = fields.Char(string=' Full Name', store=True, compute='_compute_full_name')
-    date_of_birth = fields.Date(string="Date of Birth", store=True)
+    date_of_birth = fields.Date(string="Date of Birth", store=True, required=True)
     age = fields.Integer(string='Age', required=True, readonly=True, compute='_compute_age')
     phone = fields.Char(string='Phone')
     email = fields.Char(string='Email')
     department_id = fields.Many2one(comodel_name='hospital.department', string='Department')
-    start_time = fields.Float(string='Start Time', widget="float_time")
-    end_time = fields.Float(string='End Time', widget="float_time")
+    start_time = fields.Float(string='Start Time')
+    end_time = fields.Float(string='End Time')
     image = fields.Binary(string="Patient Image")
     active = fields.Boolean(string="Active", default=True)
 
@@ -36,7 +36,10 @@ class Doctor(models.Model):
     @api.depends('first_name', 'last_name')
     def _compute_full_name(self):
         for rec in self:
-            rec.full_name = rec.first_name + ' ' + rec.last_name
+            if rec.first_name and rec.last_name:
+                rec.full_name = rec.first_name + ' ' + rec.last_name
+            else:
+                raise ValidationError('Please enter your first and last name')
 
     @api.onchange('date_of_birth')
     def _compute_age(self):

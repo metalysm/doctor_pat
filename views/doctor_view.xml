@@ -59,8 +59,8 @@
                 <field name="phone"/>
                 <field name="department_id"/>
                 <field name="email"/>
-                <field name="start_time"/>
-                <field name="end_time"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
             </tree>
         </field>
     </record>
@@ -91,8 +91,8 @@
                             <field name="phone"/>
                             <field name="email"/>
                             <field name="department_id" string="Department"/>
-                            <field name="start_time" string="Shift Start"/>
-                            <field name="end_time" string="Shift End"/>
+                            <field name="start_time" string="Shift Start" widget="float_time"/>
+                            <field name="end_time" string="Shift End" widget="float_time"/>
                         </group>
                     </group>
                 </sheet>

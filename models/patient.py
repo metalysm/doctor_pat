@@ -8,14 +8,14 @@ class HospitalPatient(models.Model):
     _rec_name = "full_name"
 
     patient_id = fields.Char(string='Patient Id', readonly=True, store=True, default=lambda self: self.env['ir.sequence'].next_by_code('hospital.patient') or _('New'))
-    first_name = fields.Char(string=' First Name')
-    last_name = fields.Char(string=' Last Name')
+    first_name = fields.Char(string=' First Name', required=True)
+    last_name = fields.Char(string=' Last Name', required=True)
     full_name = fields.Char(string=' Full Name', store=True, compute='_compute_full_name')
     date_of_birth = fields.Date(string="Date of Birth")
     age = fields.Integer(string='Age', readonly=True, compute='_compute_age')
     address = fields.Text(string='Address')
     phone = fields.Char(string='Phone')
-    email = fields.Char(string='Email')
+    email = fields.Char(string='Email', required=True)
     national_id_no = fields.Char(string='National Id No', required=True, index=True)
 
     _sql_constraints = [
