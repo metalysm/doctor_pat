@@ -12,10 +12,10 @@
                 <footer>
                     <button name="action_search_appointment_m1" type="object" string="Search Appointments (M1)"
                             class="btn-primary"/>
-                    <button name="action_search_appointment_m3" type="object" string="Search Appointments (M3)"
-                            class="btn-primary"/>
-                    <button name="action_search_appointment_m4" type="object" string="Search Appointments (M4)"
-                            class="btn-primary"/>
+<!--                    <button name="action_search_appointment_m3" type="object" string="Search Appointments (M3)"-->
+<!--                            class="btn-primary"/>-->
+<!--                    <button name="action_search_appointment_m4" type="object" string="Search Appointments (M4)"-->
+<!--                            class="btn-primary"/>-->
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

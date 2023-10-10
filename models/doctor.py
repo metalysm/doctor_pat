@@ -31,7 +31,7 @@ class Doctor(models.Model):
     def _check_unique_email(self):
         for rec in self:
             if self.search_count([('email', '=', rec.email)]) > 1:
-                raise exceptions.ValidationError("Email address must be unique.")
+                raise ValidationError("Email address must be unique.")
 
     @api.depends('first_name', 'last_name')
     def _compute_full_name(self):

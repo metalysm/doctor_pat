@@ -15,19 +15,19 @@ class SearchAppointmentWizard(models.TransientModel):
         action['domain'] = [('patient_id', '=', self.patient_id.id)]
         return action
 
-
-    def action_search_appointment_m3(self):
-        action = self.env['ir.actions.actions']._for_xml_id("doctor_pat.action_hospital_appointment")
-        action['domain'] = [('patient_id', '=', self.patient_id.id)]
-        return action
-
-    def action_search_appointment_m4(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Appointments',
-            'res_model': 'hospital.appointment',
-            'view_type': 'form',
-            'domain': [('patient_id', '=', self.patient_id.id)],
-            'view_mode': 'tree,form',
-            'target': 'current',
-        }
+    #
+    # def action_search_appointment_m3(self):
+    #     action = self.env['ir.actions.actions']._for_xml_id("doctor_pat.action_hospital_appointment")
+    #     action['domain'] = [('patient_id', '=', self.patient_id.id)]
+    #     return action
+    #
+    # def action_search_appointment_m4(self):
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Appointments',
+    #         'res_model': 'hospital.appointment',
+    #         'view_type': 'form',
+    #         'domain': [('patient_id', '=', self.patient_id.id)],
+    #         'view_mode': 'tree,form',
+    #         'target': 'current',
+    #     }

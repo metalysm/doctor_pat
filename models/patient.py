@@ -11,8 +11,8 @@ class HospitalPatient(models.Model):
     first_name = fields.Char(string=' First Name', required=True)
     last_name = fields.Char(string=' Last Name', required=True)
     full_name = fields.Char(string=' Full Name', store=True, compute='_compute_full_name')
-    date_of_birth = fields.Date(string="Date of Birth")
-    age = fields.Integer(string='Age', readonly=True, compute='_compute_age')
+    date_of_birth = fields.Date(string="Date of Birth", store=True, required=True)
+    age = fields.Integer(string='Age', readonly=True, required=True, compute='_compute_age')
     address = fields.Text(string='Address')
     phone = fields.Char(string='Phone')
     email = fields.Char(string='Email', required=True)
@@ -36,26 +36,13 @@ class HospitalPatient(models.Model):
             if rec.date_of_birth:
                 rec.age = fields.Date.today().year - rec.date_of_birth.year
 
-    def action_confirm(self):
-        for rec in self:
-            rec.state = 'confirm'
-
-    def action_done(self):
-        for rec in self:
-            rec.state = 'done'
-
-    def action_draft(self):
-        for rec in self:
-            rec.state = 'draft'
-
-    def action_cancel(self):
-        for rec in self:
-            rec.state = 'cancel'
-
     @api.depends('first_name', 'last_name')
     def _compute_full_name(self):
         for rec in self:
-            rec.full_name = rec.first_name + ' ' + rec.last_name
+            if rec.first_name and rec.last_name:
+                rec.full_name = rec.first_name + ' ' + rec.last_name
+            else:
+                raise ValidationError('Please enter your first and last name')
 
     # @api.constrains('national_id_no')
     # def _check_unique_national_id_no(self):
