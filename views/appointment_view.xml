@@ -25,6 +25,36 @@
 <!--        </field>-->
     </record>
 
+    <!--    invoice smart button view-->
+    <record id="action_open_invoice" model="ir.actions.act_window">
+        <field name="name">Invoice</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,form</field>
+<!--        <field name="domain">[('doctor_id','=', active_id)]</field>-->
+<!--        <field name="context">{'default_doctor_id': active_id}</field>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Create your first appointment !-->
+<!--            </p>-->
+<!--        </field>-->
+    </record>
+
+    <!--    payment smart button view-->
+    <record id="action_open_payment" model="ir.actions.act_window">
+        <field name="name">Payment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">tree,form</field>
+<!--        <field name="domain">[('doctor_id','=', active_id)]</field>-->
+<!--        <field name="context">{'default_doctor_id': active_id}</field>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Create your first appointment !-->
+<!--            </p>-->
+<!--        </field>-->
+    </record>
+
     <record id="view_appointment_tree" model="ir.ui.view">
         <field name="name">hospital.appointment.tree</field>
         <field name="model">hospital.appointment</field>
@@ -37,6 +67,7 @@
                 <field name="doctor_id"/>
                 <field name="patient_id"/>
                 <field name="appointment_date_time"/>
+                <field name="code"/>
                 <field name="stage" optional="show"/>
                 <field name="treatment_id"/>
             </tree>
@@ -77,16 +108,22 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" type="object" name="action_sale_order" icon="fa-money">
+                        <button class="oe_stat_button" type="object" name="action_sale_order" icon="fa-usd">
                             <field string="Sales" name="sale_order_count" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_invoice" icon="fa-list-alt">
+                            <field string="Invoices" name="invoice_count" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_payment" icon="fa-money">
+                            <field string="Payments" name="payment_count" widget="statinfo"/>
                         </button>
                     </div>
                     <group>
                         <group>
-                            <button name="action_sale_order" string="Create Sale Order" type="object" class="oe_highlight" />
+<!--                            <button name="action_sale_order" string="Create Sale Order" type="object" class="oe_highlight" />-->
                             <field name="patient_id" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>
-                            <field name="code" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>
-                            <field name="treatment_id" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" widget="one2many_list"/>
+<!--                            <field name="code" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>-->
+<!--                            <field name="treatment_id" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" widget="one2many_list"/>-->
                         </group>
                         <group>
                             <field name="doctor_id" widget="many2many_tags" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>
@@ -94,47 +131,47 @@
                         </group>
                     </group>
 
-<!--                    <notebook>-->
-<!--                        <page string="Treatments">-->
-<!--                            <field name="treatment_id" widget='one2many_list' attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" options="{'no_open': True}">-->
-<!--                                <tree editable="bottom" no_open="1" edit="1">-->
-<!--                                    &lt;!&ndash; Fields of the 'treatment.module' go here &ndash;&gt;-->
-<!--                                    <field name="name" readonly="1"/>-->
-<!--                                    <field name="appointment_id" readonly="1"/>-->
-
-<!--                                </tree>-->
-<!--                            </field>-->
-<!--                        </page>-->
-<!--                    </notebook>-->
-
                     <notebook>
-                        <page string="Doctor Prescription" name="doctor_prescription">
-                            <group>
-                                <field name="prescription"/>
-                            </group>
-                        </page>
-                        <page string="Medicine" name="medicine">
-                            <field name="prescription_line_ids">
-                                <tree editable="bottom">
-                                    <field name="name"/>
-                                    <field name="qty"/>
+                        <page string="Treatments">
+                            <field name="treatment_id" widget='one2many_list' attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" options="{'no_open': True}">
+                                <tree editable="bottom" no_open="1" edit="1">
+                                    <!-- Fields of the 'treatment.module' go here -->
+                                    <field name="name" readonly="1"/>
+                                    <field name="appointment_id" readonly="1"/>
+
                                 </tree>
-                                <form>
-                                    <group>
-                                        <group>
-                                            <field name="name"/>
-                                        </group>
-                                        <group>
-                                            <field name="qty"/>
-                                        </group>
-                                    </group>
-                                </form>
                             </field>
                         </page>
-                        <page string="Other Info" name="other_info">
-                            <field name="code"/>
-                        </page>
                     </notebook>
+
+<!--                    <notebook>-->
+<!--                        <page string="Doctor Prescription" name="doctor_prescription">-->
+<!--                            <group>-->
+<!--                                <field name="prescription"/>-->
+<!--                            </group>-->
+<!--                        </page>-->
+<!--                        <page string="Medicine" name="medicine">-->
+<!--                            <field name="prescription_line_ids">-->
+<!--                                <tree editable="bottom">-->
+<!--                                    <field name="name"/>-->
+<!--                                    <field name="qty"/>-->
+<!--                                </tree>-->
+<!--                                <form>-->
+<!--                                    <group>-->
+<!--                                        <group>-->
+<!--                                            <field name="name"/>-->
+<!--                                        </group>-->
+<!--                                        <group>-->
+<!--                                            <field name="qty"/>-->
+<!--                                        </group>-->
+<!--                                    </group>-->
+<!--                                </form>-->
+<!--                            </field>-->
+<!--                        </page>-->
+<!--                        <page string="Other Info" name="other_info">-->
+<!--                            <field name="code"/>-->
+<!--                        </page>-->
+<!--                    </notebook>-->
                 </sheet>
             </form>
         </field>
@@ -185,6 +222,13 @@
 <!--        <field name="source_id" ref="sale.utm_source_sale_order_0"/>-->
 <!--        <field name="tag_ids" eval="[(4, ref('sales_team.categ_oppor1')), (4, ref('sales_team.categ_oppor2'))]"/>-->
 <!--    </record>-->
+
+    <record id="appointment_code_sequence" model="ir.sequence">
+        <field name="name">Appointment Code</field>
+        <field name="code">hospital.appointment</field>
+        <field name="number_increment" eval="1"/>
+    </record>
+
 
     <record id="action_hospital_appointment" model="ir.actions.act_window">
         <field name="name">Appointments</field>

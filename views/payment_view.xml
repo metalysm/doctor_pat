@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_payment_tree" model="ir.ui.view">
+        <field name="name">hospital.payment.tree</field>
+        <field name="model">hospital.payment</field>
+        <field name="arch" type="xml">
+            <tree multi_edit="1">
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_payment_form" model="ir.ui.view">
+        <field name="name">hospital.payment.form</field>
+        <field name="model">hospital.payment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_payment_search" model="ir.ui.view">
+        <field name="name">hospital.payment.search</field>
+        <field name="model">hospital.payment</field>
+        <field name="arch" type="xml">
+            <search string="Payments">
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_payment" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.payment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_draft': 1}</field>
+    </record>
+
+
+    <menuitem id="menu_payment_root"
+              name="Payments"
+              parent="menu_hospital_root"
+              sequence="10"/>
+
+
+    <menuitem id="menu_payment"
+              name="Details of Payments"
+              action="action_hospital_payment"
+              parent="menu_payment_root"
+              sequence="10"
+              />
+
+</odoo>

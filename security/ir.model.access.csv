@@ -7,3 +7,5 @@ doctor_pat.access_create_appointment_wizard,access_create_appointment_wizard,doc
 doctor_pat.access_search_appointment_wizard,access_search_appointment_wizard,doctor_pat.model_search_appointment_wizard,base.group_user,1,1,1,1
 doctor_pat.access_hospital_department,access_hospital_department,doctor_pat.model_hospital_department,base.group_user,1,1,1,1
 doctor_pat.access_hospital_treatment,access_hospital_treatment,doctor_pat.model_hospital_treatment,base.group_user,1,1,1,1
+
+

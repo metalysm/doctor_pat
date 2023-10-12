@@ -3,15 +3,9 @@ from odoo.exceptions import ValidationError
 
 
 class Payment(models.Model):
-    _name = "hospital.payment"
-    _description = "Hospital Payment"
-    #_rec_name = "full_name"
+    _inherit = "account.payment"
 
     total_amount = fields.Char(string=' Total Amount', store=True, compute='_compute_total_amount')
-    # pending_amount = fields.Char(string=' Pending Amount', store=True, compute='_compute_pending_amount')
-    sale_order_line_ids = fields.One2many('sale.order.line', 'order_id', string="Sale Order Lines")
-    # sale_order_count = fields.Integer(string="Sale Orders", compute="_compute_sale_order_count")
-    # invoice_count = fields.Integer(string="Invoices", compute="_compute_invoice_count")
     payment_count = fields.Integer(string="Payments", compute="_compute_payment_count")
 
     @api.depends('sale_order_line_ids.payment_ids')
@@ -24,6 +18,38 @@ class Payment(models.Model):
         for rec in self:
             total_amount = sum(rec.sale_order_line_ids.mapped('price_total'))
             rec.total_amount = total_amount
+
+    def button_open_journal_entry(self):
+        ''' Redirect the user to this payment journal.
+        :return:    An action on account.move.
+        '''
+        self.ensure_one()
+        return {
+            'name': _("Journal Entry"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'context': {'create': False},
+            'view_mode': 'form',
+            'res_id': self.move_id.id,
+        }
+
+    def action_open_destination_journal(self):
+        ''' Redirect the user to this destination journal.
+        :return:    An action on account.move.
+        '''
+        self.ensure_one()
+
+        action = {
+            'name': _("Destination journal"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.journal',
+            'context': {'create': False},
+            'view_mode': 'form',
+            'target': 'new',
+            'res_id': self.destination_journal_id.id,
+        }
+        return action
+
 
 
 

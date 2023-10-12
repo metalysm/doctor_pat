@@ -5,5 +5,7 @@ from . import patient
 from . import department
 from . import appointment
 from . import treatment
+from . import sale_order
+from . import invoice
 
 

@@ -8,7 +8,7 @@
     'sequence': -100,
     'summary': 'summer i',
     'description': """asdas""",
-    'depends': ['base', 'mail', 'sale'],
+    'depends': ['base', 'mail', 'sale', 'account'],
     'data': [
         'security/ir.model.access.csv',
         'data/data.xml',
@@ -17,9 +17,9 @@
         'views/appointment_view.xml',
         'views/department_view.xml',
         'views/treatment_view.xml',
-        # 'views/invoice.view.xml',
+        'views/invoice_view.xml',
         # 'views/payment_view.xml',
-        # 'views/sale_order_view.xml',
+        'views/sale_order_view.xml',
         'views/menu.xml',
         'wizard/create_appointment_view.xml',
         'wizard/search_appointment_view.xml'
