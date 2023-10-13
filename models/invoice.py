@@ -2,17 +2,20 @@ from odoo import models, fields, api
 
 
 class Invoice(models.Model):
+    _name = 'account.move'
     _inherit = 'account.move'
 
     appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
     appointment_count = fields.Integer(string='Appointment', compute='_compute_appointment_count')
+    invoice_count = fields.Integer(string='Invoice', compute='_compute_invoice_count')
+    invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoices', store=True)
 
     @api.depends('appointment_id')
     def _compute_appointment_count(self):
-        for order in self:
-            order.appointment_count = len(order.appointment_id) if order.appointment_id else 0
+        for rec in self:
+            rec.appointment_count = len(rec.appointment_id) if rec.appointment_id else 0
 
-    def action_view_sale_appointment(self):
+    def action_view_appointment(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -36,6 +39,17 @@ class Invoice(models.Model):
     #         'target': 'current',
     #     }
 
+    # def action_view_payment(self):
+    #     self.ensure_one()
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': 'Invoices',
+    #         'view_mode': 'tree,form',
+    #         'res_model': 'account.payment',
+    #         'domain': [('invoice_ids', '=', self.id)],
+    #         'context': {'default_invoice_ids': self.id},
+    #         'target': 'current',
+    #     }
 
 
 

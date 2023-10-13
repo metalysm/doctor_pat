@@ -21,14 +21,16 @@ class HospitalAppointment(models.Model):
                                             string="Prescription Lines")
 
     appointment_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
-    #
-    total_amount = fields.Char(string=' Total Amount', store=True, compute='_compute_total_amount')
+    total_amount = fields.Float(string="Total Amount", compute="_compute_total_amount", store=True)
     pending_amount = fields.Char(string=' Pending Amount', store=True, compute='_compute_pending_amount')
-    sale_order_line_ids = fields.One2many('sale.order.line', 'order_id', string="Sale Order Lines")
+
+    sale_order_line_ids = fields.One2many('sale.order.line', 'order_id', string="Sale Order Line")
     sale_order_count = fields.Integer(string="Sale Orders", compute="_compute_sale_order_count")
-    invoice_count = fields.Integer(string="Invoices", compute="_compute_invoice_count")
+    sale_order_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
+    invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoice', compute='_compute_invoice_ids')
+
+    invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
     payment_count = fields.Integer(string="Payments", compute="_compute_payment_count")
-    invoice_ids = fields.One2many('account.move', 'appointment_id', string="Invoices")
 
     _sql_constraints = [
         ('unique_code', 'unique(code)', 'Code must be unique.'),
@@ -54,13 +56,13 @@ class HospitalAppointment(models.Model):
         print("BUTTON CANCEL")
         self.stage = 'cancel'
 
-    @api.model    # generate unique codes
+    @api.model  # generate unique codes
     def create(self, vals):
         print("Appointment create vals ", vals)
         vals['code'] = self.env['ir.sequence'].next_by_code("hospital.appointment")
         return super(HospitalAppointment, self).create(vals)
 
-    def unlink(self):   # for undeletable done states
+    def unlink(self):  # for undeletable done states
         if self.stage == 'done':
             raise ValidationError(_("You Cannot Delete %s as it is in Done State" % self.code))
         return super(HospitalAppointment, self).unlink()
@@ -75,6 +77,11 @@ class HospitalAppointment(models.Model):
     #
     # PHASE 2 METHODS
     #
+
+    @api.depends('invoice_ids')
+    def _compute_invoice_ids(self):
+        for rec in self:
+            rec.invoice_ids = self.env['account.move'].search([('appointment_id', '=', rec.id)])
 
     @api.depends('sale_order_line_ids')
     def _compute_total_amount(self):
@@ -96,15 +103,15 @@ class HospitalAppointment(models.Model):
             sale_order_count = self.env['sale.order'].search_count([('appointment_id', '=', rec.id)])
             rec.sale_order_count = sale_order_count
 
-    # def _compute_sale_order_count(self):
-    #     for record in self:
-    #         record.sale_order_count = self.env['sale.order.line'].search_count(
-    #             [('order_id', '=', self.id)])
-
     @api.depends('invoice_ids')
     def _compute_invoice_count(self):
-        for appointment in self:
-            appointment.invoice_count = len(appointment.invoice_ids)
+        for rec in self:
+            rec.invoice_count = len(rec.invoice_ids)
+
+    # @api.depends('invoice_ids')
+    # def _compute_invoice_count(self):
+    #     for appointment in self:
+    #         appointment.invoice_count = len(appointment.invoice_ids)
 
     # @api.depends('sale_order_line_ids.invoice_status')
     # def _compute_invoice_count(self):
@@ -124,8 +131,8 @@ class HospitalAppointment(models.Model):
             'name': 'Sale Orders',
             'res_model': 'sale.order',
             'view_mode': 'tree,form',
-            'domain': [('appointment_id', '=', self.id)],
-            'context': {'default_appointment_id': self.id},
+            'domain': [('appointment_id', '=', self.id)],  # filtered
+            'context': {'default_appointment_id': self.id},  # setting default appointment
         }
         return action
         # for appointment in self:
@@ -159,16 +166,30 @@ class HospitalAppointment(models.Model):
         #     }
 
     def action_invoice(self):
-        self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
-
+        self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
             'name': 'Invoices',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'view_id': self.env.ref('account.view_move_form').id,
             'res_model': 'account.move',
-            'view_mode': 'tree,form',
             'domain': [('appointment_id', '=', self.id)],
-            'context': {'default_appointment_id': self.id},
+            # 'context': {'default_appointment_id': self.id},
+            'context': "{'type':'out_invoice'}",
+            'target': 'current',
         }
+        # self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
+        #
+        # return {
+        #     'type': 'ir.actions.act_window',
+        #     'name': 'Invoices',
+        #     'res_model': 'account.move',
+        #     'view_mode': 'tree,form',
+        #     'domain': [('appointment_id', '=', self.id)],
+        #     'context': {'default_appointment_id': self.id},
+        #     'stage': 'posted'
+        # }
 
     def action_payment(self):
         for appointment in self:
@@ -199,25 +220,6 @@ class HospitalAppointment(models.Model):
                 'view_mode': 'form',
                 'target': 'current',
             }
-        # for appointment in self:
-        #     payment_values = {
-        #         'partner_id': appointment.patient_id.id,
-        #         # 'date_order': appointment.appointment_date_time,
-        #     }
-        #     print("Payment Oluşturuldu")
-        #
-        #     payment = self.env['account.payment'].create(payment_values)
-        #
-        #     # Ödeme düzenleme
-        #     self.env.context = dict(self.env.context, default_payment_id=payment.id)
-        #     return {
-        #         'name': 'Payment',
-        #         'type': 'ir.actions.act_window',
-        #         'res_model': 'account.payment',
-        #         'res_id': payment.id,
-        #         'view_mode': 'form',
-        #         'target': 'current',
-        #     }
 
 
 class AppointmentPrescriptionLines(models.Model):

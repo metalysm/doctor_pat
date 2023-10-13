@@ -137,7 +137,7 @@
                                 <tree editable="bottom" no_open="1" edit="1">
                                     <!-- Fields of the 'treatment.module' go here -->
                                     <field name="name" readonly="1"/>
-                                    <field name="appointment_id" readonly="1"/>
+<!--                                    <field name="appointment_id" readonly="1"/>-->
 
                                 </tree>
                             </field>

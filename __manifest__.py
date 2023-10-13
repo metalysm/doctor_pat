@@ -18,7 +18,7 @@
         'views/department_view.xml',
         'views/treatment_view.xml',
         'views/invoice_view.xml',
-        # 'views/payment_view.xml',
+        'views/payment_view.xml',
         'views/sale_order_view.xml',
         'views/menu.xml',
         'wizard/create_appointment_view.xml',
