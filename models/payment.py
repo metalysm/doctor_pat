@@ -7,7 +7,7 @@ class Payment(models.Model):
 
     appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
     appointment_count = fields.Integer(string='Appointment', compute='_compute_appointment_count')
-    invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoices', store=True)
+    # invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoices', store=True)
 
     @api.depends('appointment_id')
     def _compute_appointment_count(self):

@@ -20,14 +20,15 @@ class HospitalAppointment(models.Model):
     prescription_line_ids = fields.One2many('appointment.prescription.lines', 'appointment_id',
                                             string="Prescription Lines")
 
-    appointment_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
+    # appointment_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
     total_amount = fields.Float(string="Total Amount", compute="_compute_total_amount", store=True)
     pending_amount = fields.Char(string=' Pending Amount', store=True, compute='_compute_pending_amount')
 
-    sale_order_line_ids = fields.One2many('sale.order.line', 'order_id', string="Sale Order Line")
+    sale_order_line_ids = fields.One2many('sale.order.line', 'appointment_id', string="Sale Order Line")
     sale_order_count = fields.Integer(string="Sale Orders", compute="_compute_sale_order_count")
     sale_order_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
     invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoice', compute='_compute_invoice_ids')
+    account_move_id = fields.Many2one('account.move')
 
     invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
     payment_count = fields.Integer(string="Payments", compute="_compute_payment_count")
@@ -97,10 +98,10 @@ class HospitalAppointment(models.Model):
                     'price_total'))
             rec.pending_amount = pending_amount
 
-    @api.depends('appointment_id')
+    @api.depends('sale_order_line_ids')
     def _compute_sale_order_count(self):
         for rec in self:
-            sale_order_count = self.env['sale.order'].search_count([('appointment_id', '=', rec.id)])
+            sale_order_count = self.env['sale.order'].search_count([('appointment_id', '=', self.id)])
             rec.sale_order_count = sale_order_count
 
     @api.depends('invoice_ids')
@@ -135,35 +136,7 @@ class HospitalAppointment(models.Model):
             'context': {'default_appointment_id': self.id},  # setting default appointment
         }
         return action
-        # for appointment in self:
-        #     patient_name = appointment.patient_id.full_name if appointment.patient_id else ''
-        #     customer_values = {
-        #         'name': f"{patient_name}",
-        #         # Diğer gerekli müşteri bilgilerini burada ekleyin
-        #     }
-        #     customer = self.env['res.partner'].create(customer_values)
-        #
-        #     sale_order_values = {
-        #         'partner_id': customer.id,
-        #         # 'partner_id', '=', appointment.patient_id.id,
-        #         'date_order': appointment.appointment_date_time,
-        #         'note': 'Appointment Patient: %s' % customer.name,
-        #         # Diğer gerekli bilgileri burada ekleyin
-        #     }
-        #     print("Sale Order Oluşturuldu")
-        #
-        #     sale_order = self.env['sale.order'].create(sale_order_values)
-        #
-        #     # Satış siparişini düzenleme
-        #     self.env.context = dict(self.env.context, default_sale_order_id=sale_order.id)
-        #     return {
-        #         'name': 'Sale Order',
-        #         'type': 'ir.actions.act_window',
-        #         'res_model': 'sale.order',
-        #         'res_id': sale_order.id,
-        #         'view_mode': 'form',
-        #         'target': 'current',
-        #     }
+
 
     def action_invoice(self):
         self.ensure_one()
