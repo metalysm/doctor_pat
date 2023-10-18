@@ -29,9 +29,17 @@ class HospitalAppointment(models.Model):
     sale_order_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
     invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoice', compute='_compute_invoice_ids')
     account_move_id = fields.Many2one('account.move')
+    payment_ids = fields.One2many('account.payment', 'appointment_id', string='Payment', compute='_compute_payment_ids')
+    account_payment_id = fields.Many2one('account.payment')
+    partner_id = fields.Many2one(
+        comodel_name='res.partner',
+        string="Customer",
+        required=True, readonly=False, change_default=True, index=True,
+        tracking=1,)
+        # domain="[('type', '!=', 'private'), ('company_id', 'in', (False, company_id))]")
 
     invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
-    payment_count = fields.Integer(string="Payments", compute="_compute_payment_count")
+    payment_count = fields.Integer(string="Payment Count", compute="_compute_payment_count")
 
     _sql_constraints = [
         ('unique_code', 'unique(code)', 'Code must be unique.'),
@@ -57,7 +65,7 @@ class HospitalAppointment(models.Model):
         print("BUTTON CANCEL")
         self.stage = 'cancel'
 
-    @api.model  # generate unique codes
+    @api.model
     def create(self, vals):
         print("Appointment create vals ", vals)
         vals['code'] = self.env['ir.sequence'].next_by_code("hospital.appointment")
@@ -84,6 +92,11 @@ class HospitalAppointment(models.Model):
         for rec in self:
             rec.invoice_ids = self.env['account.move'].search([('appointment_id', '=', rec.id)])
 
+    @api.depends('payment_ids')
+    def _compute_payment_ids(self):
+        for rec in self:
+            rec.payment_ids = self.env['account.payment'].search([('appointment_id', '=', rec.id)])
+
     @api.depends('sale_order_line_ids')
     def _compute_total_amount(self):
         for rec in self:
@@ -104,15 +117,19 @@ class HospitalAppointment(models.Model):
             sale_order_count = self.env['sale.order'].search_count([('appointment_id', '=', self.id)])
             rec.sale_order_count = sale_order_count
 
-    @api.depends('invoice_ids')
-    def _compute_invoice_count(self):
-        for rec in self:
-            rec.invoice_count = len(rec.invoice_ids)
-
     # @api.depends('invoice_ids')
     # def _compute_invoice_count(self):
-    #     for appointment in self:
-    #         appointment.invoice_count = len(appointment.invoice_ids)
+    #     for rec in self:
+    #         rec.invoice_count = len(rec.invoice_ids)
+
+    # @api.depends('invoice_ids')
+    def _compute_invoice_count(self):
+        for rec in self:
+            invoice_count = self.env['account.move'].search_count([
+                ('appointment_id', '=', rec.id)
+                # Add your search criteria here.
+            ])
+            rec.invoice_count = invoice_count
 
     # @api.depends('sale_order_line_ids.invoice_status')
     # def _compute_invoice_count(self):
@@ -120,10 +137,26 @@ class HospitalAppointment(models.Model):
     #         rec.invoice_count = len(
     #             rec.sale_order_line_ids.filtered(lambda line: line.invoice_status == 'invoiced'))
 
-    @api.depends('sale_order_line_ids.is_downpayment')
+    # @api.depends('sale_order_line_ids.payment_ids')
+    @api.depends('payment_ids')
     def _compute_payment_count(self):
         for rec in self:
-            rec.payment_count = len(rec.sale_order_line_ids.mapped('is_downpayment'))
+            payment_count = self.env['account.payment'].search_count([('appointment_id', '=', self.id)])
+            rec.payment_count = payment_count
+        # payment_model = self.env['account.payment']
+        #
+        # # Define a domain to filter payments based on your criteria
+        # domain = [
+        #     ('state', '=', 'posted'),  # Filter by payment state, e.g., only count posted payments
+        # ]
+        #
+        # # Use the search_count method to count payments that match the domain
+        # payment_count = payment_model.search_count(domain)
+        #
+        # return payment_count
+        # for rec in self:
+        #     rec.payment_count = len(rec.sale_order_line_ids.mapped('payment_ids'))
+            # rec.payment_count = len(rec.payment_ids)
 
     def action_sale_order(self):
         self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
@@ -137,23 +170,70 @@ class HospitalAppointment(models.Model):
         }
         return action
 
+    def action_sale_order_create(self):
+        self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
+        self.partner_id = self.env['res.partner'].create({
+            'name': self.patient_id.full_name,
+        })
+
+
+        sale_order_values = {
+            'partner_id': self.partner_id.id,
+            'appointment_id': self.id,
+            'order_line': []
+        }
+
+        sale_order = self.env['sale.order'].create(sale_order_values)
+        order_line_id = self.env['sale.order.line'].create({
+            'product_id': self.env['product.product'].search([('id', '=', 7)]).id,
+            'order_id': sale_order.id,
+        })
+        print('sale order: ', sale_order.name)
+        print('partner id : ', sale_order.partner_id.name)
+
+        self.sale_order_id = sale_order.id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Sale Orders',
+            'res_model': 'sale.order',
+            'res_id': sale_order.id,
+            'view_mode': 'form',
+            # 'domain': [('appointment_id', '=', self.id)],  # filtered  #akıllı buton için
+            # 'context': {'default_appointment_id': self.id},  # setting default appointment
+            'target': 'current'
+        }
 
     def action_invoice(self):
         self.ensure_one()
+        # Create a new invoice
+        # Open the created invoice in form view
+        invoice_ids = self.env['account.move'].search([
+            ('appointment_id', '=', self.id)
+            # Add your search criteria here.
+        ])
+        print('invoice id :', invoice_ids)
+
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Invoices',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': self.env.ref('account.view_move_form').id,
+            'name': 'Invoice',
             'res_model': 'account.move',
-            'domain': [('appointment_id', '=', self.id)],
-            # 'context': {'default_appointment_id': self.id},
-            'context': "{'type':'out_invoice'}",
+            # 'res_id': invoice_ids.id,
+            'view_mode': 'tree,form',
             'target': 'current',
+            # 'type': 'ir.actions.act_window',
+            # 'name': 'Invoices',
+            # 'view_type': 'tree,form',
+            # 'view_mode': 'form',
+            # # 'view_id': self.env.ref('account.view_move_form').id,
+            # 'res_model': 'account.move',
+            'domain': [('appointment_id', '=', self.id)],
+            #'domain': [('id', 'in', invoice_ids.ids)]
+            # 'context': {'default_appointment_id': self.id},
+            # # 'context': "{'type':'out_invoice'}",
+            # 'target': 'current',
         }
         # self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
-        #
+
         # return {
         #     'type': 'ir.actions.act_window',
         #     'name': 'Invoices',

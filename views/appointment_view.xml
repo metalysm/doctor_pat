@@ -40,6 +40,18 @@
 <!--        </field>-->
     </record>
 
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page/field[@name='order_line']" position="after">
+                <field name="invoice_count" widget="statinfo" options="{'clickable': '1'}"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <!--    payment smart button view-->
     <record id="action_open_payment" model="ir.actions.act_window">
         <field name="name">Payment</field>
@@ -120,10 +132,12 @@
                     </div>
                     <group>
                         <group>
-<!--                            <button name="action_sale_order" string="Create Sale Order" type="object" class="oe_highlight" />-->
+
                             <field name="patient_id" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>
 <!--                            <field name="code" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>-->
 <!--                            <field name="treatment_id" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" widget="one2many_list"/>-->
+<!--                            <button name="action_sale_order" string="Create Sale Order" type="object" class="oe_highlight" />-->
+                            <button name="action_sale_order_create" string="Create Sale Order" type="object" class="oe_highlight"/>
                         </group>
                         <group>
                             <field name="doctor_id" widget="many2many_tags" attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}"/>
@@ -138,40 +152,10 @@
                                     <!-- Fields of the 'treatment.module' go here -->
                                     <field name="name" readonly="1"/>
 <!--                                    <field name="appointment_id" readonly="1"/>-->
-
                                 </tree>
                             </field>
                         </page>
                     </notebook>
-
-<!--                    <notebook>-->
-<!--                        <page string="Doctor Prescription" name="doctor_prescription">-->
-<!--                            <group>-->
-<!--                                <field name="prescription"/>-->
-<!--                            </group>-->
-<!--                        </page>-->
-<!--                        <page string="Medicine" name="medicine">-->
-<!--                            <field name="prescription_line_ids">-->
-<!--                                <tree editable="bottom">-->
-<!--                                    <field name="name"/>-->
-<!--                                    <field name="qty"/>-->
-<!--                                </tree>-->
-<!--                                <form>-->
-<!--                                    <group>-->
-<!--                                        <group>-->
-<!--                                            <field name="name"/>-->
-<!--                                        </group>-->
-<!--                                        <group>-->
-<!--                                            <field name="qty"/>-->
-<!--                                        </group>-->
-<!--                                    </group>-->
-<!--                                </form>-->
-<!--                            </field>-->
-<!--                        </page>-->
-<!--                        <page string="Other Info" name="other_info">-->
-<!--                            <field name="code"/>-->
-<!--                        </page>-->
-<!--                    </notebook>-->
                 </sheet>
             </form>
         </field>

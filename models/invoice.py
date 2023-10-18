@@ -2,14 +2,12 @@ from odoo import models, fields, api
 
 
 class Invoice(models.Model):
-    _name = 'account.move'
     _inherit = 'account.move'
 
-    appointment_id = fields.Many2one('hospital.appointment', string='Appointment')  # one2many another
-    appointment_ids = fields.One2many('hospital.appointment', 'account_move_id')  # ayarla. 2 field olacak her birinde.
+    appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
+    appointment_ids = fields.One2many('hospital.appointment', 'account_move_id')
     appointment_count = fields.Integer(string='Appointment', compute='_compute_appointment_count')
-    invoice_count = fields.Integer(string='Invoice', compute='_compute_invoice_count')
-
+    # invoice_count = fields.Integer(string='Invoice', compute='_compute_invoice_count')
     # invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoices', store=True)
 
     @api.depends('appointment_id')
@@ -31,8 +29,13 @@ class Invoice(models.Model):
 
     @api.model
     def create(self, vals):
-        print('create method ')  # deniyoruz bişiler
-        print('valssssss')
+        print('<<<<<<<create method account.move >>>>>>>')  # deniyoruz bişiler
+        print("<<<<<<<<<<<<<<<<<<<vals>>>>>>>>>>>>>>>>>>>")
         print(vals)
+        print(self.id)
+        if 'invoice_origin' in vals and vals['invoice_origin']:
+            sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])])
+            vals['appointment_id'] = sale_order.appointment_id.id
         rec = super(Invoice, self).create(vals)
         return rec
+
