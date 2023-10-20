@@ -25,9 +25,12 @@ class HospitalAppointment(models.Model):
 
     sale_order_line_ids = fields.One2many('sale.order.line', 'appointment_id', string="Sale Order Line")
     sale_order_count = fields.Integer(string="Sale Orders", compute="_compute_sale_order_count")
+    sale_order_ids = fields.One2many('sale.order', 'appointment_id', string="Sales Order")
     sale_order_id = fields.Many2one(comodel_name="sale.order", string="Sale Order")
+    invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
     invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoice', compute='_compute_invoice_ids')
     account_move_id = fields.Many2one('account.move')
+    payment_count = fields.Integer(string="Payment Count", compute="_compute_payment_count")
     payment_ids = fields.One2many('account.payment', 'appointment_id', string='Payment', compute='_compute_payment_ids')
     account_payment_id = fields.Many2one('account.payment')
     partner_id = fields.Many2one(
@@ -36,8 +39,7 @@ class HospitalAppointment(models.Model):
         # required=True, readonly=False, change_default=True, index=True,
         # tracking=1,)
 
-    invoice_count = fields.Integer(string='Invoice Count', compute='_compute_invoice_count')
-    payment_count = fields.Integer(string="Payment Count", compute="_compute_payment_count")
+
 
     _sql_constraints = [
         ('unique_code', 'unique(code)', 'Code must be unique.'),
@@ -118,11 +120,13 @@ class HospitalAppointment(models.Model):
     # @api.depends('invoice_ids')
     def _compute_invoice_count(self):
         for rec in self:
-            # invoice_count = self.env['account.move'].search_count([
-            #     ('appointment_id', '=', rec.id)
-            #     # Add your search criteria here.
-            # ])
-            rec.invoice_count = len(rec.invoice_ids)
+            invoice_count = self.env['account.move'].search_count([
+                ('appointment_id', '=', rec.id), ('state', '=', 'posted'),
+                ('payment_state', 'in', ('in_payment', 'paid'))
+                # Add your search criteria here.
+            ])
+            rec.invoice_count = invoice_count
+            # rec.invoice_count = len(rec.invoice_ids)
 
     # @api.depends('sale_order_line_ids.payment_ids')
     # @api.depends('payment_ids')
@@ -151,7 +155,7 @@ class HospitalAppointment(models.Model):
         self.ensure_one()  # Tek bir kayıt için çalıştığından emin olun.
         self.partner_id = self.env['res.partner'].create({
             'name': self.patient_id.full_name,
-            'mobile': self.patient_id.phone,
+            'phone': self.patient_id.phone,
             'email': self.patient_id.email,
         })
 
@@ -202,7 +206,9 @@ class HospitalAppointment(models.Model):
             # 'view_mode': 'form',
             # # 'view_id': self.env.ref('account.view_move_form').id,
             # 'res_model': 'account.move',
-            'domain': [('appointment_id', '=', self.id)],
+            # 'domain': [('appointment_id', '=', self.id)],
+            'domain': [('appointment_id', '=', self.id), ('state', '=', 'posted'),
+                       ('payment_state', 'in', ('in_payment', 'paid'))],  # Filter by appointment
             #'domain': [('id', 'in', invoice_ids.ids)]
             # 'context': {'default_appointment_id': self.id},
             # # 'context': "{'type':'out_invoice'}",
