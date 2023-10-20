@@ -144,7 +144,7 @@
                     <notebook>
                         <page string="Treatments">
                             <field name="treatment_id" widget='one2many_list' attrs="{'readonly': [('stage', 'in', ['done', 'cancel'])]}" options="{'no_open': True}">
-                                <tree editable="bottom" no_open="1" edit="1">
+                                <tree editable="bottom" no_open="1" edit="0" create="0" delete="0">
                                     <!-- Fields of the 'treatment.module' go here -->
                                     <field name="name" readonly="1"/>
 <!--                                    <field name="appointment_id" readonly="1"/>-->
