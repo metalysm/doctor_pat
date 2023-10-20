@@ -5,16 +5,19 @@ from odoo.exceptions import ValidationError
 class Payment(models.Model):
     _inherit = "account.payment"
 
-    appointment_id = fields.Many2one('hospital.appointment', string='Appointment')  # One2many another
-    appointment_ids = fields.One2many('hospital.appointment', 'account_payment_id')  # ayarla. 2 field olacak her birinde.
+    appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
+    appointment_ids = fields.One2many('hospital.appointment', 'account_payment_id', compute='_compute_appointment_count')
     appointment_count = fields.Integer(string='Appointment', compute='_compute_appointment_count')
-    # payment_count = fields.Integer(string='Invoice', compute='_compute_payment_count')
-    # invoice_ids = fields.One2many('account.move', 'appointment_id', string='Invoices', store=True)
 
     @api.depends('appointment_id')
     def _compute_appointment_count(self):
         for rec in self:
             rec.appointment_count = len(rec.appointment_id) if rec.appointment_id else 0
+        # for rec in self:
+        #     rec.appointment_ids = self.env['hospital.appointment'].search([
+        #         ('account_payment_id', '=', rec.id)
+        #     ])
+        #     rec.appointment_count = len(rec.appointment_ids) if rec.appointment_ids else 0
 
     def action_view_appointment(self):
         self.ensure_one()
@@ -30,7 +33,7 @@ class Payment(models.Model):
 
     @api.model
     def create(self, vals):
-        print('<<<<<<<create method account.payment >>>>>>>')  # deniyoruz bişiler
+        print('<<<<<<<create method account.payment >>>>>>>')
         print("<<<<<<<<<<<<<<<<<<<vals>>>>>>>>>>>>>>>>>>>")
         print(vals)
         print(self.id)

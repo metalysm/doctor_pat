@@ -16,9 +16,9 @@
                     <field string="Invoices" name="invoice_count" widget="statinfo"/>
                 </button>
             </xpath>
-            <xpath expr="//sheet/notebook/page/field[@name='order_line']" position="after">
-                <field name="invoice_count" widget="statinfo" options="{'clickable': '1'}"/>
-            </xpath>
+<!--            <xpath expr="//sheet/notebook/page/field[@name='order_line']" position="after">-->
+<!--                <field name="invoice_count" widget="statinfo" options="{'clickable': '1'}"/>-->
+<!--            </xpath>-->
 <!--                <button class="oe_stat_button" type="object" name="action_open_invoice" icon="fa-list-alt">-->
 <!--                    <field string="Invoices" name="invoice_count" widget="statinfo"/>-->
 <!--                </button>-->
