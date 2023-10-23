@@ -26,13 +26,11 @@
         </field>
     </record>
 
-    <record id="action_view_invoices" model="ir.actions.act_window">
-        <field name="name">Invoices</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form</field>
-<!--        <field name="view_type">tree,form</field>-->
-        <field name="domain">[('partner_id', '=', appointment_id), ('type_name', '=', 'out_invoice')]</field>
-<!--        <field name="search_view_id" ref="account.view_move_filter"/>-->
-    </record>
+<!--    <record id="action_view_invoices" model="ir.actions.act_window">-->
+<!--        <field name="name">Invoices</field>-->
+<!--        <field name="res_model">account.move</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--        <field name="domain">[('partner_id', '=', appointment_id), ('type_name', '=', 'out_invoice')]</field>-->
+<!--    </record>-->
 
 </odoo>

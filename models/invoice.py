@@ -35,7 +35,12 @@ class Invoice(models.Model):
         print(self.id)
         if 'invoice_origin' in vals and vals['invoice_origin']:
             sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])])
-            vals['appointment_id'] = sale_order.appointment_id.id
+            if sale_order:
+                vals['appointment_id'] = sale_order.appointment_id.id
         rec = super(Invoice, self).create(vals)
         return rec
-
+        # if 'invoice_origin' in vals and vals['invoice_origin']:
+        #     sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])])
+        #     vals['appointment_id'] = sale_order.appointment_id.id
+        # rec = super(Invoice, self).create(vals)
+        # return rec

@@ -27,7 +27,7 @@ doctor_pat.access_hospital_department,access_hospital_department,doctor_pat.mode
 doctor_pat.access_hospital_treatment,access_hospital_treatment,doctor_pat.model_hospital_treatment,hospital_doctor_access,1,1,1,0
 
 access_hospital_patient,access.hospital.patient,model_hospital_patient,hospital_patient_access,1,0,0,0
-access_hospital_doctor,access.hospital.doctor,model_hospital_doctor,hospital_patient_access,0,0,0,0
+access_hospital_doctor,access.hospital.doctor,model_hospital_doctor,hospital_patient_access,1,0,0,0
 access_hospital_appointment,access.hospital.appointment,model_hospital_appointment,doctor_pat.hospital_patient_access,1,0,0,0
 access_appointment_prescription_lines,access.appointment.prescription.lines,model_appointment_prescription_lines,hospital_patient_access,1,0,0,0
 doctor_pat.access_create_appointment_wizard,access_create_appointment_wizard,doctor_pat.model_create_appointment_wizard,hospital_patient_access,1,0,0,0

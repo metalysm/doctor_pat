@@ -90,7 +90,7 @@ class HospitalAppointment(models.Model):
     @api.depends('invoice_ids')
     def _compute_invoice_ids(self):
         for rec in self:
-            rec.invoice_ids = self.env['account.move'].search([('appointment_id', '=', rec.id)])
+            rec.invoice_ids = self.env['account.move'].search([('appointment_id', '=', rec.id), ('move_type', '=', 'out_invoice')])
 
     @api.depends('payment_ids')
     def _compute_payment_ids(self):
@@ -121,8 +121,8 @@ class HospitalAppointment(models.Model):
     def _compute_invoice_count(self):
         for rec in self:
             invoice_count = self.env['account.move'].search_count([
-                ('appointment_id', '=', rec.id), ('state', '=', 'posted'),
-                ('payment_state', 'in', ('in_payment', 'paid'))
+                ('appointment_id', '=', rec.id),
+                ('move_type', '=', 'out_invoice')
                 # Add your search criteria here.
             ])
             rec.invoice_count = invoice_count
@@ -147,7 +147,7 @@ class HospitalAppointment(models.Model):
             'res_model': 'sale.order',
             'view_mode': 'tree,form',
             'domain': [('appointment_id', '=', self.id)],  # filtered
-            'context': {'default_appointment_id': self.id},  # setting default appointment
+            # 'context': {'default_appointment_id': self.id},  # setting default appointment
         }
         return action
 
@@ -188,10 +188,6 @@ class HospitalAppointment(models.Model):
 
     def action_invoice(self):
         # self.ensure_one()
-        invoice_ids = self.env['account.move'].search([
-            ('appointment_id', '=', self.id)
-        ])
-        print('invoice id :', invoice_ids)
 
         return {
             'type': 'ir.actions.act_window',
@@ -207,9 +203,8 @@ class HospitalAppointment(models.Model):
             # # 'view_id': self.env.ref('account.view_move_form').id,
             # 'res_model': 'account.move',
             # 'domain': [('appointment_id', '=', self.id)],
-            'domain': [('appointment_id', '=', self.id), ('state', '=', 'posted'),
-                       ('payment_state', 'in', ('in_payment', 'paid'))],  # Filter by appointment
-            #'domain': [('id', 'in', invoice_ids.ids)]
+            'domain': [('appointment_id', '=', self.id), ('move_type', '=', 'out_invoice')],  # Filter by appointment
+            # 'domain': [('id', 'in', invoice_ids.ids)]
             # 'context': {'default_appointment_id': self.id},
             # # 'context': "{'type':'out_invoice'}",
             # 'target': 'current',
