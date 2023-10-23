@@ -20,15 +20,12 @@
             <form position="absolute">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="appointment_id"/>
-                        </group>
-                        <group>
-                            <field name="is_done"/>
-                        </group>
+                        <field name="name"/>
+                        <field name="is_done"/>
                     </group>
-
+                    <group>
+                        <field name="appointment_id"/>
+                    </group>
                 </sheet>
             </form>
         </field>

@@ -8,4 +8,4 @@ class Treatment(models.Model):
 
     name = fields.Char(string='Name', index=True)
     is_done = fields.Boolean(string='Is Done')
-    appointment_id = fields.Many2one('hospital.appointment', string='Appointment')
+    appointment_id = fields.One2many('hospital.appointment', 'treatment_id', string='Appointment')

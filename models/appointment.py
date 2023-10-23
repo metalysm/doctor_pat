@@ -15,7 +15,7 @@ class HospitalAppointment(models.Model):
     patient_id = fields.Many2one(comodel_name='hospital.patient', string="Patient", required=True)
     stage = fields.Selection([('draft', 'Draft'), ('in-progress', 'In Progress'), ('done', 'Done'),
                               ('cancel', 'Cancel')], default='draft', string="Stage")
-    treatment_id = fields.One2many('hospital.treatment', 'appointment_id', string='Treatments')
+    treatment_id = fields.Many2one('hospital.treatment', string='Treatments')
     prescription = fields.Text(string="Prescription")
     prescription_line_ids = fields.One2many('appointment.prescription.lines', 'appointment_id',
                                             string="Prescription Lines")
